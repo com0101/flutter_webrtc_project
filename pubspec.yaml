@@ -42,6 +42,8 @@ dependencies:
   uuid: ^3.0.7
   awesome_notifications: ^0.7.4+1
   flutter_webrtc: ^0.9.27
+  line_icons: ^2.0.0
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:
