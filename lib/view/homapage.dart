@@ -1,7 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_project/view/webrtc_logic.dart';
 
 import '../constants/dart/colors.dart';
+import '../firebase_options.dart';
 import 'item_story_view.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,6 +27,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  WebRTCLogic webrtcLogic = WebRTCLogic();
+  final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  String? roomId;
+  TextEditingController textEditingController = TextEditingController(text: '');
+
+  initializeWebRTC() async {
+    _localRenderer.initialize();
+    _remoteRenderer.initialize();
+
+    webrtcLogic.onAddRemoteStream = ((stream) {
+      _remoteRenderer.srcObject = stream;
+      setState(() {});
+    });
+
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  @override
+  void initState() {
+
+    initializeWebRTC();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _localRenderer.dispose();
+    _remoteRenderer.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,14 +108,72 @@ class _HomePageState extends State<HomePage> {
               )
             ),
             const Divider(thickness: 1, color: superLightGrey),
+            Row(
+              children: [
+                const SizedBox(width: 16),
+                ElevatedButton(
+                    onPressed: () async {
+                      roomId = await webrtcLogic.createRoom(_remoteRenderer);
+                      textEditingController.text = roomId!;
+                    },
+                    child: const Text('Create room')
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                    onPressed: () {
+                      webrtcLogic.joinRoom(textEditingController.text, _remoteRenderer);
+                    },
+                    child: const Text('Join room')
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    webrtcLogic.hangUp(_localRenderer);
+                  },
+                  child: const Text('Hand up')
+                )
+              ],
+            ),
             Container(
-                height: 500,
+                height: 200,
                 padding: const EdgeInsets.only(left: 16),
                 child: ListView(
                   scrollDirection: Axis.vertical,
-                  children: List.generate(5, (index) =>
-                      chatWidget(size: 70, imgUrl: "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"),
+                  children: List.generate(2, (index) =>
+                    GestureDetector(
+                      onTap: () => {
+                          webrtcLogic.openUserMedia(_localRenderer, _remoteRenderer)
+                      },
+                      child: chatWidget(size: 70, imgUrl: "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"),
+                    )
                   )
+                )
+            ),
+            Container(
+                margin: const EdgeInsets.only(top: 16),
+                alignment: Alignment.topLeft,
+                height: 20,
+                padding: const EdgeInsets.only(left: 16),
+                child: const Text('Join the Room:')
+            ),
+            Container(
+                alignment: Alignment.topLeft,
+                height: 20,
+                padding: const EdgeInsets.only(left: 16),
+                child: Flexible(
+                  child: TextFormField(
+
+                    controller: textEditingController,
+                  ),
+                )
+            ),
+            Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                      Expanded(child: RTCVideoView(_localRenderer, mirror: true,)),
+                      Expanded(child: RTCVideoView(_remoteRenderer))
+                  ],
                 )
             )
           ],

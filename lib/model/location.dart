@@ -4,5 +4,5 @@ class Location {
   final String state;
   final String street;
 
-  Location(this.city, this.postcode, this.state, this.street)
+  Location(this.city, this.postcode, this.state, this.street);
 }

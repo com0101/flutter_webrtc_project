@@ -1,6 +1,6 @@
 import 'package:flutter_webrtc_project/model/user.dart';
 
-import '../../model/locarion.dart';
+import '../../model/location.dart';
 
 
 User user = User(

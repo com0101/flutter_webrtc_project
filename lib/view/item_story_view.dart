@@ -72,6 +72,13 @@ Widget chatWidget({required double size, required String imgUrl}) {
               Text("Bro, their fire", style: TextStyle(fontSize: 13, color: lightGrey)),
             ],
           ),
+          Expanded(
+              child: Container(
+                alignment: Alignment.centerRight,
+                margin: const EdgeInsets.only(right: 16),
+                child: const Icon(Icons.video_call_outlined, size: 25),
+            )
+          )
         ],
       ),
       const Divider(thickness: 1, color: superLightGrey),

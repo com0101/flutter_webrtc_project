@@ -1,4 +1,4 @@
-import 'locarion.dart';
+import 'location.dart';
 
 class User {
   final String name;
