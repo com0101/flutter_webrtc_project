@@ -135,14 +135,17 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             Container(
-                height: 200,
+                height: 100,
                 padding: const EdgeInsets.only(left: 16),
                 child: ListView(
                   scrollDirection: Axis.vertical,
-                  children: List.generate(2, (index) =>
+                  children: List.generate(1, (index) =>
                     GestureDetector(
-                      onTap: () => {
-                          webrtcLogic.openUserMedia(_localRenderer, _remoteRenderer)
+                      onTap: () async {
+                          await webrtcLogic.openUserMedia(_localRenderer, _remoteRenderer);
+                          setState(() {
+
+                          });
                       },
                       child: chatWidget(size: 70, imgUrl: "https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"),
                     )
@@ -169,7 +172,8 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                       Expanded(child: RTCVideoView(_localRenderer, mirror: true,)),
                       Expanded(child: RTCVideoView(_remoteRenderer))
